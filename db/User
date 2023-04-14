@@ -1,0 +1,14 @@
+[
+	{
+		"id": "1",
+		"username": "foo",
+		"password": "$2a$10$voJjN.0MHBZr2D9qcxN7/ep3ka57Yjf.VFN8GIXYf4buuMQtUCt36",
+		"is_deleted": true
+	},
+	{
+		"id": "2",
+		"username": "bar",
+		"password": "$2a$10$zcXv1BMSTvR6Qf1z/9cmgeQGC9t32jvq8UbkG60Dk5T4t9jfKI5I2",
+		"is_deleted": false
+	}
+]

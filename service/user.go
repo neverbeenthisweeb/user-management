@@ -11,7 +11,7 @@ import (
 
 type User interface {
 	Login(context.Context, model.User) (model.Token, error)
-	// List(context.Context, model.UserListFilter) ([]model.User, error)
+	List(context.Context, model.UserListFilter) ([]model.User, error)
 	// AddUser(context.Context, model.User) (model.User, error)
 	// RemoveUser(context.Context, model.User) error
 }
@@ -49,21 +49,23 @@ func (s *userImpl) Login(ctx context.Context, m model.User) (model.Token, error)
 	}
 
 	// Get existing password from store
-	existingPw, err := s.repoUser.GetPassword(ctx, m.Username)
+	existingPw, err := s.repoUser.GetUserByUsername(ctx, m.Username)
 	if err != nil {
 		logger.Error().Err(err).Msg("Failed to get password")
 		return model.Token{}, err
 	}
 
 	// Compare password
-	pw, err := s.infraHasher.Hash([]byte(m.Password))
-	if err != nil {
-		logger.Error().Err(err).Msg("Failed to hash password")
-		return model.Token{}, err
-	}
 
-	if string(pw) != existingPw {
-		logger.Error().Err(ErrPasswordWrong).Msg("Password does not match")
+	// debugPw, err := s.infraHasher.GenerateFromPassword([]byte(m.Password), -1)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// fmt.Println(string(debugPw)) // FIXME: Debugging to create hash
+
+	err = s.infraHasher.CompareHashAndPassword([]byte(existingPw), []byte(m.Password))
+	if err != nil {
+		logger.Error().Err(err).Msg("Password does not match")
 		return model.Token{}, ErrPasswordWrong
 	}
 
@@ -75,4 +77,20 @@ func (s *userImpl) Login(ctx context.Context, m model.User) (model.Token, error)
 	}
 
 	return model.Token{AccessToken: token}, nil
+}
+
+func (u *userImpl) List(ctx context.Context, filter model.UserListFilter) ([]model.User, error) {
+	logger := log.With().
+		Str("method", "userImpl.List").
+		Str("requestid", ctx.Value("requestid").(string)).
+		Logger()
+
+	// Get list of users
+	users, err := u.repoUser.FetchUser(ctx, filter)
+	if err != nil {
+		logger.Error().Err(err).Msg("Failed to fetch users")
+		return []model.User{}, err
+	}
+
+	return users, nil
 }

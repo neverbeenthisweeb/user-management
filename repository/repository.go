@@ -1,6 +1,9 @@
 package repository
 
-import "context"
+import (
+	"context"
+	"usermanagement/model"
+)
 
 type Repository struct {
 	User User
@@ -15,6 +18,7 @@ func (r *Repository) SetUser(u User) {
 }
 
 type User interface {
-	// Get password of an active user
-	GetPassword(ctx context.Context, username string) (string, error)
+	// Get an active user
+	GetUserByUsername(ctx context.Context, username string) (string, error)
+	FetchUser(ctx context.Context, filter model.UserListFilter) ([]model.User, error)
 }

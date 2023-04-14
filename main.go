@@ -5,7 +5,7 @@ import (
 	"usermanagement/infrastructure/hasher"
 	"usermanagement/infrastructure/usertokengenerator"
 	"usermanagement/repository"
-	"usermanagement/repository/inmemory"
+	"usermanagement/repository/jsondb"
 	"usermanagement/service"
 	"usermanagement/transport"
 
@@ -15,12 +15,12 @@ import (
 func main() {
 	// Setup infrastructure
 	infra := infrastructure.NewInfrastructure()
-	infra.SetHasher(hasher.NewNoop())
+	infra.SetHasher(hasher.NewDefaultHasher())
 	infra.SetUserTokenGenerator(usertokengenerator.NewJWT())
 
 	// Setup repository
 	repo := repository.NewRepository()
-	repo.SetUser(inmemory.NewUserRepository())
+	repo.SetUser(jsondb.NewUserRepository())
 
 	// Setup service
 	svc := service.NewUserImpl(infra, repo)

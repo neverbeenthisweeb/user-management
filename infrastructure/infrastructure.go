@@ -19,9 +19,10 @@ func (inf *Infrastructure) SetUserTokenGenerator(utg UserTokenGenerator) {
 	inf.UserTokenGenerator = utg
 }
 
-// FIXME: Create bcrypt hasher implementation
 type Hasher interface {
-	Hash(text []byte) ([]byte, error)
+	CompareHashAndPassword(hashedPassword, password []byte) error
+	Cost(hashedPassword []byte) (int, error)
+	GenerateFromPassword(password []byte, cost int) ([]byte, error)
 }
 
 type UserTokenGenerator interface {

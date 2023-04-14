@@ -8,6 +8,10 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+const (
+	errMsgMissingOrMalformedJWT = "Missing or malformed JWT"
+)
+
 type errResponse struct {
 	ErrorMessage string `json:"error_message"`
 }
@@ -17,6 +21,10 @@ func ErrHandler(c *fiber.Ctx, err error) error {
 
 	if v, ok := err.(service.ServiceErr); ok {
 		code = v.Code
+	}
+
+	if err.Error() == errMsgMissingOrMalformedJWT {
+		code = http.StatusUnauthorized
 	}
 
 	// Send error response
